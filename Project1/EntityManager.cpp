@@ -44,12 +44,19 @@ void EntityManager::removeDeadEntities(EntityVec& vec)
 {
 	/*for (auto i : vec) 
 	{
-		std::cout << i << " ";
+		std::cout << i << " ";fsadfasdasdasdsa
 	}*/
 	// TODO: remove all dead entities from the input vector
 	//		 this is called by the update() function
+	auto new_end = std::remove_if(vec.begin(), vec.end(), [](const std::shared_ptr<Entity> e) { return !e->isActive(); });
 
+	vec.erase(new_end, vec.end());
+
+	// SEEMS TO COMPILE AND LINK, TEST W LIFESPAN 
+	// 
+	// 
 	//TEST THIS SOMEHOW?
+	// vec.erase(std::remove_if(vec.begin(), vec.end() - 1, [](const std::shared_ptr<Entity> e) { return !e->isActive(); }), vec.end());
 	//vec.erase(std::remove_if(vec.begin(), vec.end() - 1, [](const std::shared_ptr<Entity> e) { return !e->isActive(); }), vec.begin());
 	//for (auto e : vec)
 	//{	
