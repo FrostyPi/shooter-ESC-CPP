@@ -4,13 +4,17 @@
 #include <vector>
 #include <map>
 
-typedef std::vector<std::shared_ptr<Entity>> EntityVec;
-typedef std::map<std::string, EntityVec>     EntityMap;
+typedef std::vector<std::shared_ptr<Entity>>		EntityVec;
+typedef std::map<std::string, EntityVec>			EntityMap;
+typedef std::map<int, std::shared_ptr<Entity>>      EntityTBR;
 
 class EntityManager
 {
 	EntityVec m_entities;
 	EntityVec m_entitiesToAdd;
+
+	EntityTBR m_entitiesToRemove;
+
 	EntityMap m_entityMap;
 	size_t    m_totalEntities = 0;
 

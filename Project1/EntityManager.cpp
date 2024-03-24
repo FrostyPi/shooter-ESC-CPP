@@ -34,7 +34,7 @@ void EntityManager::update()
 
 	// remove dead entities from each vector in the entity map
 	// C++17 way of iterating through [key, value] pairs in a map
-	for (auto& [tag, entityVec] : m_entityMap)
+	for (auto & [tag, entityVec] : m_entityMap)
 	{
 		removeDeadEntities(entityVec);
 	}
@@ -42,16 +42,37 @@ void EntityManager::update()
 
 void EntityManager::removeDeadEntities(EntityVec& vec)
 {
+	int i = 0;
+	for (auto e : vec)
+	{
+
+		if (!e->isActive())
+		{
+			m_entitiesToRemove[i] = e;
+			//m_entitiesToRemove.push_back(e);
+		}
+		i++;
+	}
+
+	for (auto & [index, enTitty] : m_entitiesToRemove)
+	{
+
+		//FIGURE THIS OUT
+		vec.erase
+	}
+	// ok fucking yolo
+
+
 	/*for (auto i : vec) 
 	{asdasdasdas
-		std::cout << i << " ";fsadfasdasdasdsadasdasd
+		//std::cout << i << " ";fsadfasdasdasdsadasdasd
 	}*/
 	// TODO: remove all dead entities from the input vector
 	//		 this is called by the update() function
-	auto new_end = std::remove_if(vec.begin(), vec.end(), [](const std::shared_ptr<Entity> e) { return !e->isActive(); });
+	//auto new_end = std::remove_if(vec.begin(), vec.end(), [&](const std::shared_ptr<Entity> & e) { return !e->isActive(); });
 
-	vec.erase(new_end, vec.end());
-
+	//vec.erase(new_end, end(vec));
+	// OK NEVERMIND DOESNT FCUKIGN WORK
 	// SEEMS TO COMPILE AND LINK, TEST W LIFESPAN 
 	// 
 	// 
