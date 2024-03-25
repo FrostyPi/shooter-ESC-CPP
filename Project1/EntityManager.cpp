@@ -60,7 +60,7 @@ void EntityManager::removeDeadEntities(EntityVec& vec)
 		//FIGURE THIS OUT
 		vec.erase
 	}
-	// ok fucking yolo
+	// ok fucking yolo 
 
 
 	/*for (auto i : vec) 
