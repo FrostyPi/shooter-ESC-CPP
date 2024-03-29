@@ -40,26 +40,37 @@ void EntityManager::update()
 	}
 }
 
-void EntityManager::removeDeadEntities(EntityVec& vec)
+void EntityManager::removeDeadEntities(EntityVec & vec)
 {
-	int i = 0;
-	for (auto e : vec)
-	{
 
-		if (!e->isActive())
-		{
-			m_entitiesToRemove[i] = e;
-			//m_entitiesToRemove.push_back(e);
-		}
-		i++;
-	}
+	//for (size_t i = 0; i < vec.size();) {
+	//	if (!vec[i]->isActive()) {
+	//		vec[i] = vec[vec.size() - 1];
+	//		vec.pop_back();
+	//	}
+	//	else {
+	//		i++;
+	//	}
+	//}
+	vec.erase(std::remove_if(vec.begin(), vec.end(), [](std::shared_ptr<Entity> entity) { return !entity->isActive(); }), vec.end());
+	//int i = 0;
+	//for (auto e : vec)
+	//{
 
-	for (auto & [index, enTitty] : m_entitiesToRemove)
-	{
+	//	if (!e->isActive())
+	//	{
+	//		m_entitiesToRemove[i] = e;
+	//		//m_entitiesToRemove.push_back(e);
+	//	}
+	//	i++;
+	//}
 
-		//FIGURE THIS OUT
-		vec.erase
-	}
+	//for (auto & [index, enTitty] : m_entitiesToRemove)
+	//{
+
+	//	//FIGURE THIS OUT
+	//	//vec.erase
+	//}
 	// ok fucking yolo 
 
 
@@ -76,6 +87,8 @@ void EntityManager::removeDeadEntities(EntityVec& vec)
 	// SEEMS TO COMPILE AND LINK, TEST W LIFESPAN 
 	// 
 	// 
+	// 
+	//vec.erase(std::remove_if(vec.begin(), vec.end(), [](Entity entity) { return !entity.isActive(); }), vec.end());
 	//TEST THIS SOMEHOW?
 	// vec.erase(std::remove_if(vec.begin(), vec.end() - 1, [](const std::shared_ptr<Entity> e) { return !e->isActive(); }), vec.end());
 	//vec.erase(std::remove_if(vec.begin(), vec.end() - 1, [](const std::shared_ptr<Entity> e) { return !e->isActive(); }), vec.begin());

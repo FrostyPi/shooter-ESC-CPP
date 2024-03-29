@@ -26,6 +26,8 @@ public:
 	std::shared_ptr<CLifespan>	cLifespan;
 
 	// private member access functions
+	//bool operator
+
 	bool isActive() const;
 	const std::string & tag() const;
 	const size_t id() const;

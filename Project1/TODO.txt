@@ -1,0 +1,10 @@
+
+
+Current TODO:
+implement a comparison < operator for the entities, in terms of m_id to allow for sorting upon removing
+
+POTENTIAL IDEAS FOR REMOVAL:
+ - swap to remove, and then sort
+ - erase-remove within a loop? perhaps using m_id
+ - vec.erase(std::remove_if(vec.begin(), vec.end(), [](std::shared_ptr<Entity> entity) { return !entity->isActive(); }), vec.end());
+ - faster solution?
