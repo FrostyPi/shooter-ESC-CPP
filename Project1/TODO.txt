@@ -8,3 +8,15 @@ POTENTIAL IDEAS FOR REMOVAL:
  - erase-remove within a loop? perhaps using m_id
  - vec.erase(std::remove_if(vec.begin(), vec.end(), [](std::shared_ptr<Entity> entity) { return !entity->isActive(); }), vec.end());
  - faster solution?
+
+
+ OK NOW TODO:
+ 1. implement lifespan
+ 2. 
+
+
+
+
+ ISSUES:
+GHOST ENTITIES: removal doesn't fully work because some functions may reference destroyed entity, namely the player and enemies
+remove components or something? idk man

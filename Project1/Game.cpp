@@ -65,15 +65,18 @@ void Game::spawnPlayer()   //1:22:08
 	// middle spawn
 	float mx = m_window.getSize().x / 2.0f;
 	float my = m_window.getSize().y / 2.0f;
+	float radius = 32.0f;
 
 	//Give this entity a Transform so it spawns at (200, 200) with velocity (1,1) and angle 0
 	entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0f);
 
 	//entity's shape will have radius 32, 8 sides, dark grey fill, red outline, thickness 4
-	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
+	entity->cShape = std::make_shared<CShape>(radius, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
 
 	//input component to the player
 	entity->cInput = std::make_shared<CInput>();
+
+	entity->cCollision = std::make_shared<CCollision>(radius);
 
 	//entity is player, set game's player variable to be this
 	m_player = entity;
@@ -96,6 +99,7 @@ void Game::spawnEnemy()
 	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(1.0f, 1.0f), 0.0f);
 
 	entity->cShape = std::make_shared<CShape>(radius, vertices, sf::Color(0, 255, 0), sf::Color(255, 255, 255), 4.0f);
+	entity->cCollision = std::make_shared<CCollision>(radius);
 
 	//record when the most recent enemy was spawneds
 	m_lastEnemySpawnTime = m_currentFrame;
@@ -123,10 +127,17 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 	// velocity as vector
 
 	auto bullet = m_entities.addEntity("bullet");
+	float radius = 10;
 	//sets position at player, and velocity has speed four due to normalization of vector. maybe a more efficient solution?
 	bullet->cTransform = std::make_shared<CTransform>(Vec2(entity->cTransform->pos.x, entity->cTransform->pos.y), Vec2(target.x - entity->cTransform->pos.x, target.y - entity->cTransform->pos.y).normalize()*4, 0.0f);
-	bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(255, 255, 255), sf::Color(255, 0, 0), 2.0f);
-	bullet->cLifespan = std::make_shared<CLifespan>(10);  // for both remaining and total
+	
+
+	bullet->cShape = std::make_shared<CShape>(radius, 8, sf::Color(255, 255, 255), sf::Color(255, 0, 0), 2.0f);
+	bullet->cCollision = std::make_shared<CCollision>(radius);
+
+	bullet->cLifespan = std::make_shared<CLifespan>(120);// for both remaining and total
+
+	
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
@@ -139,7 +150,7 @@ void Game::sMovement()
 	// TODO: implement all entity movement (BULLETS)
 	// read m_player->cInput component to determine if the player is moving
 	for (auto b : m_entities.getEntities("bullet")) {
-		std::cout << b->cTransform->velocity.x << " " << b->cTransform->velocity.y;
+		//std::cout << b->cTransform->velocity.x << " " << b->cTransform->velocity.y;
 		b->cTransform->pos.x += b->cTransform->velocity.x;
 		b->cTransform->pos.y += b->cTransform->velocity.y;
 	}
@@ -179,7 +190,7 @@ void Game::sLifespan()
 	{
 		if (e->cLifespan == nullptr)
 		{
-			std::cout << e->tag();
+			//std::cout << e->tag();
 			continue;
 		}
 		else
@@ -187,25 +198,20 @@ void Game::sLifespan()
 			if (e->cLifespan->remaining > 0)
 			{
 				e->cLifespan->remaining -= 1;
+				
+				sf::Color currentColor = e->cShape->circle.getFillColor();
+				currentColor.a -= 2;
+				e->cShape->circle.setFillColor(currentColor);
 				// set ALPHA CHANNEL ACCORDINGHLYe->cShape.
+				//e->cShape->circle.setFillColor()
 
 			}
-			//else 
-			//{
-			// // m_active?
-				// TODO: DESTROY
-			//}
+			else 
+			{
+				e->destroy();
+			}
 		}
 	}
-	// TODO: implement all lifespan functionality
-	//for (auto )
-	//for all entities
-	//		if entity has no lifespan component, skip
-	//		if entity has > 0 remaining lifespan, subtract 1
-	//		if it has lifespan and is alivecvb    
-	//				scale alpha channel accordingly
-	//		if it has lifespan and time is up,
-	//				destroy
 
 }
 
@@ -214,13 +220,39 @@ void Game::sCollision()
 	// TODO: implement collisions between entities
 	//		  collision radius, not shape radius
 	// entity.destroy()
-	for (auto b : m_entities.getEntities("bullet"))
+
+	for (auto e : m_entities.getEntities("enemy"))
 	{
-		for (auto e : m_entities.getEntities("enemy"))
+		//std::cout << (pow(m_player->cCollision->radius - e->cCollision->radius, 2)) << std::endl;
+		//std::cout << (m_player->cTransform->pos.dist2(e->cTransform->pos));
+		if ((pow(m_player->cCollision->radius + e->cCollision->radius, 2)) >= (m_player->cTransform->pos.dist2(e->cTransform->pos)))
+		{
+			
+			m_player->destroy();
+			//std::cout << "Colliding";
+		}
+
+		for (auto b : m_entities.getEntities("bullet"))
+		{
+			if ((pow(b->cCollision->radius + e->cCollision->radius, 2)) >= (b->cTransform->pos.dist2(e->cTransform->pos)))
+			{
+				b->destroy();
+				e->destroy();
+			}
+		}
+		/*for (auto b : m_entities.getEntities("bullet"))
 		{
 
-		}
+		}*/
+			//m_player->cTransform->pos
 	}
+	//for (auto b : m_entities.getEntities("bullet"))
+	//{
+	//	for (auto e : m_entities.getEntities("enemy"))
+	//	{
+
+	//	}
+	//}
 }
 
 void Game::sEnemySpawner() 
@@ -289,20 +321,20 @@ void Game::sUserInput()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::W:
-				std::cout << "W Key Pressed\n";
+				//std::cout << "W Key Pressed\n";
 				m_player->cInput->up = true;
 				//TODO: set player's input component "up" to true
 				break;
 			case sf::Keyboard::A:
-				std::cout << "A Key Pressed\n";
+				//std::cout << "A Key Pressed\n";
 				m_player->cInput->left = true;
 				break;
 			case sf::Keyboard::S:
-				std::cout << "S Key Pressed\n";
+				//std::cout << "S Key Pressed\n";
 				m_player->cInput->down = true;
 				break;
 			case sf::Keyboard::D:
-				std::cout << "D Key Pressed\n";
+				//std::cout << "D Key Pressed\n";
 				m_player->cInput->right = true;
 				break;
 			default: break;
@@ -314,19 +346,19 @@ void Game::sUserInput()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::W:
-				std::cout << "W Key Released\n";
+				//std::cout << "W Key Released\n";
 				m_player->cInput->up = false;
 				break;
 			case sf::Keyboard::A:
-				std::cout << "A Key Released\n";
+				//std::cout << "A Key Released\n";
 				m_player->cInput->left = false;
 				break;
 			case sf::Keyboard::S:
-				std::cout << "S Key Released\n";
+				//std::cout << "S Key Released\n";
 				m_player->cInput->down = false;
 				break;
 			case sf::Keyboard::D:
-				std::cout << "W Key Released\n";
+				//std::cout << "W Key Released\n";
 				m_player->cInput->right = false;
 				break;
 			default: break;
@@ -336,7 +368,7 @@ void Game::sUserInput()
 		{
 			if (event.mouseButton.button == sf::Mouse::Left)
 			{  
-				std::cout << "Left Mouse Button Clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+				//std::cout << "Left Mouse Button Clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
 				// TODO: call spawnBullet here, EDIT TO MAKE IT SO YOU CAN HOLD DOWN LEFT CLICK
 				spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
 
@@ -344,7 +376,7 @@ void Game::sUserInput()
 
 			if (event.mouseButton.button == sf::Mouse::Right)
 			{
-				std::cout << "Right Mouse Button clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+				//std::cout << "Right Mouse Button clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
 				// TODO: call spawnSpecialWeapon
 			}
 		}	

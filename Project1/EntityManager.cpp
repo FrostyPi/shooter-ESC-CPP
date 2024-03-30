@@ -24,7 +24,7 @@ void EntityManager::update()
 
 		 //Push the bullet entity into the vector associated with the "bullet" key
 		m_entityMap[e->tag()].push_back(e);
-
+		
 	}
 
 	m_entitiesToAdd.clear();
@@ -117,8 +117,7 @@ const EntityVec& EntityManager::getEntities()
 	return m_entities;
 }
 
-const EntityVec& EntityManager::getEntities(const std::string & tag)
+const EntityVec& EntityManager::getEntities(const std::string & tag) 
 {
-	// TODO: this is incorrect, return correct vector from the map
 	return m_entityMap[tag];
 }
