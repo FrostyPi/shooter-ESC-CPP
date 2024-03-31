@@ -2,6 +2,7 @@
 //1:00:16, incomplete
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 Game::Game(const std::string & config)
 {
@@ -114,11 +115,27 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 {
 	//TODO: spawn small enemies at the location of the input enemy e
 
-	/*auto smallEntity = m_entities.addEntity("small");
+	
 
-	smallEntity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(1.0f, 1.0f), 0.0f);
+	float radius = e->cShape->circle.getRadius() / 3;
+	float speed = 4.0f;
+	double fullCircle = 2 * 3.14159265358979323846;
 
-	smallEntity->cShape = std::make_shared<CShape>(e->cShape->circle.getRadius() / 8, e->cShape->circle.getPointCount(), sf::Color(0, 255, 0), sf::Color(255, 255, 255), 4.0f);
+	
+	// MY MATH IS WRONG, FIGURE IT OUT
+	for (int i = 1; i <= e->cShape->circle.getPointCount(); i++)
+	{
+		auto small_entity = m_entities.addEntity("small");
+		float new_cos_X = cos(fullCircle / i);
+		float new_sin_Y = sin(fullCircle / i);
+		small_entity->cTransform = std::make_shared<CTransform>(e->cTransform->pos, Vec2(new_cos_X * speed, new_sin_Y * speed), 0.0f);
+
+		small_entity->cShape = std::make_shared<CShape>(radius, e->cShape->circle.getPointCount(), e->cShape->circle.getFillColor(), e->cShape->circle.getOutlineColor(), 4.0f);
+		small_entity->cCollision = std::make_shared<CCollision>(radius);
+	}
+	/*smallEntity->cTransform = std::make_shared<CTransform>(e->cTransform->pos, Vec2(1.0f, 1.0f), 0.0f);
+
+	smallEntity->cShape = std::make_shared<CShape>(radius, e->cShape->circle.getPointCount(), e->cShape->circle.getFillColor(), e->cShape->circle.getOutlineColor(), 4.0f);
 	smallEntity->cCollision = std::make_shared<CCollision>(radius);*/
 
 	// when we create the smaller enemy, read values of the original enemy
@@ -127,7 +144,7 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 	// - enemies worth double points of original enemy
 }
 
-// spawns a bullet froma  given entity to a target location
+// spawns a bullet froma  given entity to a target locations
 void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 {
 	//TODO:  implement the spawning of a bullet which travles towards targhet
