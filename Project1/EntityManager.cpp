@@ -11,7 +11,7 @@ void EntityManager::update()
 	//TODO: add entities from m_entitiesToAdd to the proper location(s)
 	//		- add them to the vector of all entities //
 	//		- add them to the vector inside the map, with the tag as a key
-	for (auto e : m_entitiesToAdd)
+	for (auto& e : m_entitiesToAdd)
 	{
 		m_entities.push_back(e);
 
@@ -30,7 +30,7 @@ void EntityManager::update()
 	m_entitiesToAdd.clear();
 
 	// remove dead entities from the vector of all entities
-	removeDeadEntities(m_entities);
+	
 
 	// remove dead entities from each vector in the entity map
 	// C++17 way of iterating through [key, value] pairs in a map
@@ -38,69 +38,12 @@ void EntityManager::update()
 	{
 		removeDeadEntities(entityVec);
 	}
+	removeDeadEntities(m_entities);
 }
 
 void EntityManager::removeDeadEntities(EntityVec & vec)
 {
-
-	//for (size_t i = 0; i < vec.size();) {
-	//	if (!vec[i]->isActive()) {
-	//		vec[i] = vec[vec.size() - 1];
-	//		vec.pop_back();
-	//	}
-	//	else {
-	//		i++;
-	//	}
-	//}
 	vec.erase(std::remove_if(vec.begin(), vec.end(), [](std::shared_ptr<Entity> entity) { return !entity->isActive(); }), vec.end());
-	//int i = 0;
-	//for (auto e : vec)
-	//{
-
-	//	if (!e->isActive())
-	//	{
-	//		m_entitiesToRemove[i] = e;
-	//		//m_entitiesToRemove.push_back(e);
-	//	}
-	//	i++;
-	//}
-
-	//for (auto & [index, enTitty] : m_entitiesToRemove)
-	//{
-
-	//	//FIGURE THIS OUT
-	//	//vec.erase
-	//}
-	// ok fucking yolo 
-
-
-	/*for (auto i : vec) 
-	{asdasdasdas
-		//std::cout << i << " ";fsadfasdasdasdsadasdasd
-	}*/
-	// TODO: remove all dead entities from the input vector
-	//		 this is called by the update() function
-	//auto new_end = std::remove_if(vec.begin(), vec.end(), [&](const std::shared_ptr<Entity> & e) { return !e->isActive(); });
-
-	//vec.erase(new_end, end(vec));
-	// OK NEVERMIND DOESNT FCUKIGN WORK
-	// SEEMS TO COMPILE AND LINK, TEST W LIFESPAN 
-	// 
-	// 
-	// 
-	//vec.erase(std::remove_if(vec.begin(), vec.end(), [](Entity entity) { return !entity.isActive(); }), vec.end());
-	//TEST THIS SOMEHOW?
-	// vec.erase(std::remove_if(vec.begin(), vec.end() - 1, [](const std::shared_ptr<Entity> e) { return !e->isActive(); }), vec.end());
-	//vec.erase(std::remove_if(vec.begin(), vec.end() - 1, [](const std::shared_ptr<Entity> e) { return !e->isActive(); }), vec.begin());
-	//for (auto e : vec)
-	//{	
-	//	if (!e->isActive())
-	//	{
-
-	//		//remove from vec, perhaps try std::remove_if
-	//		// CONSIDER concurrent iterator modification, this should be the only function where this may happen.
-	//	}
-	//}
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string & tag)
