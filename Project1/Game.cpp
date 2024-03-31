@@ -273,9 +273,25 @@ void Game::sCollision()
 	
 	}
 
+	if (m_player->cTransform->pos.x > (m_window.getSize().x - m_player->cCollision->radius))
+	{
+		m_player->cTransform->pos.x = m_window.getSize().x - m_player->cCollision->radius;
+	}
+	else if (m_player->cTransform->pos.x < m_player->cCollision->radius) 
+	{
+		m_player->cTransform->pos.x = m_player->cCollision->radius;
+	}
 
+	if (m_player->cTransform->pos.y > (m_window.getSize().y - m_player->cCollision->radius))
+	{
+		m_player->cTransform->pos.y = m_window.getSize().y - m_player->cCollision->radius;
+	}
+	else if (m_player->cTransform->pos.y < m_player->cCollision->radius)
+	{
+		m_player->cTransform->pos.y = m_player->cCollision->radius;
+	}
 	//for (auto e : m_entities.getEntities("enemy"))
-	//{
+	//{w
 	//	//std::cout << (pow(m_player->cCollision->radius - e->cCollision->radius, 2)) << std::endl;
 	//	//std::cout << (m_player->cTransform->pos.dist2(e->cTransform->pos));
 	//	if ((pow(m_player->cCollision->radius + e->cCollision->radius, 2)) >= (m_player->cTransform->pos.dist2(e->cTransform->pos)))
