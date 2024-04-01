@@ -119,19 +119,20 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 
 	float radius = e->cShape->circle.getRadius() / 3;
 	float speed = 4.0f;
-	double fullCircle = 2 * 3.14159265358979323846;
+	double spread_angle = 2 * 3.14159265358979323846 / e->cShape->circle.getPointCount();
 
 	
 	// MY MATH IS WRONG, FIGURE IT OUT
 	for (int i = 1; i <= e->cShape->circle.getPointCount(); i++)
 	{
 		auto small_entity = m_entities.addEntity("small");
-		float new_cos_X = cos(fullCircle / i);
-		float new_sin_Y = sin(fullCircle / i);
+		float new_cos_X = cos(spread_angle * i);
+		float new_sin_Y = sin(spread_angle * i);
 		small_entity->cTransform = std::make_shared<CTransform>(e->cTransform->pos, Vec2(new_cos_X * speed, new_sin_Y * speed), 0.0f);
 
 		small_entity->cShape = std::make_shared<CShape>(radius, e->cShape->circle.getPointCount(), e->cShape->circle.getFillColor(), e->cShape->circle.getOutlineColor(), 4.0f);
 		small_entity->cCollision = std::make_shared<CCollision>(radius);
+		small_entity->cLifespan = std::make_shared<CLifespan>(60);
 	}
 	/*smallEntity->cTransform = std::make_shared<CTransform>(e->cTransform->pos, Vec2(1.0f, 1.0f), 0.0f);
 
@@ -232,7 +233,10 @@ void Game::sLifespan()
 				
 				sf::Color currentColor = e->cShape->circle.getFillColor();
 				currentColor.a -= 2;
+				sf::Color current_outline_color = e->cShape->circle.getOutlineColor();
+				current_outline_color.a -= 2;
 				e->cShape->circle.setFillColor(currentColor);
+				e->cShape->circle.setOutlineColor(current_outline_color);
 				// set ALPHA CHANNEL ACCORDINGHLYe->cShape.
 				//e->cShape->circle.setFillColor()
 
@@ -265,8 +269,19 @@ void Game::sCollision()
 
 		}
 
-	}
+		//small enemy collisions with bullets
+		for (auto s : m_entities.getEntities("small"))
+		{
+			if ((pow(b->cCollision->radius + s->cCollision->radius, 2)) >= (b->cTransform->pos.dist2(s->cTransform->pos)))
+			{
+				b->destroy();
+				s->destroy();
+			}
 
+		}
+
+	}
+	// enemies with walls + player
 	for (auto e : m_entities.getEntities("enemy")) 
 	{
 		if (e->cTransform->pos.x > (m_window.getSize().x - e->cCollision->radius) || e->cTransform->pos.x < e->cCollision->radius)
@@ -278,18 +293,51 @@ void Game::sCollision()
 			e->cTransform->velocity.y *= -1.0f;
 		}
 
-		if ((pow(m_player->cCollision->radius + e->cCollision->radius, 2)) >= (m_player->cTransform->pos.dist2(e->cTransform->pos)))
+		if (e->isActive())
 		{
-			std::cout << "Colliding" << std::endl;
-			e->destroy();
-			m_player->cTransform->pos.x = m_window.getSize().x / 2;
-			m_player->cTransform->pos.y = m_window.getSize().y / 2;
 
-					//std::cout << "Colliding";
+			if ((pow(m_player->cCollision->radius + e->cCollision->radius, 2)) >= (m_player->cTransform->pos.dist2(e->cTransform->pos)))
+			{
+				//std::cout << "Colliding" << std::endl;
+
+				e->destroy();
+				m_player->cTransform->pos.x = m_window.getSize().x / 2;
+				m_player->cTransform->pos.y = m_window.getSize().y / 2;
+
+
+				//std::cout << "Colliding";
+			}
 		}
 	
+	
 	}
+	// small enemies with walls + player
+	for (auto s : m_entities.getEntities("small"))
+	{
+		if (s->cTransform->pos.x > (m_window.getSize().x - s->cCollision->radius) || s->cTransform->pos.x < s->cCollision->radius)
+		{
+			s->cTransform->velocity.x *= -1.0f;
+		}
+		if (s->cTransform->pos.y > (m_window.getSize().y - s->cCollision->radius) || s->cTransform->pos.y < s->cCollision->radius)
+		{
+			s->cTransform->velocity.y *= -1.0f;
+		}
 
+		if (s->isActive())
+		{
+
+			if ((pow(m_player->cCollision->radius + s->cCollision->radius, 2)) >= (m_player->cTransform->pos.dist2(s->cTransform->pos)))
+			{
+				//std::cout << "Colliding" << std::endl;
+				s->destroy();
+				m_player->cTransform->pos.x = m_window.getSize().x / 2;
+				m_player->cTransform->pos.y = m_window.getSize().y / 2;
+			}
+
+
+		}
+	}
+	
 	if (m_player->cTransform->pos.x > (m_window.getSize().x - m_player->cCollision->radius))
 	{
 		m_player->cTransform->pos.x = m_window.getSize().x - m_player->cCollision->radius;

@@ -30,7 +30,7 @@ void EntityManager::update()
 	m_entitiesToAdd.clear();
 
 	// remove dead entities from the vector of all entities
-	
+	removeDeadEntities(m_entities);
 
 	// remove dead entities from each vector in the entity map
 	// C++17 way of iterating through [key, value] pairs in a map
@@ -38,7 +38,9 @@ void EntityManager::update()
 	{
 		removeDeadEntities(entityVec);
 	}
-	removeDeadEntities(m_entities);
+	
+	std::cout << m_entities.size();
+
 }
 
 void EntityManager::removeDeadEntities(EntityVec & vec)
